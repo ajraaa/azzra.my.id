@@ -32,7 +32,7 @@ export default function ProjectList({ children }: ProjectListProps) {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-6"
     >
       {Array.isArray(children) ? (
         children.map((child, index) => (

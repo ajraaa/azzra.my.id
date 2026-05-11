@@ -10,7 +10,6 @@ import ProjectEntry from '../components/ProjectEntry.astro';
 import DotGrid from '../components/visuals/DotGrid.astro';
 import NodeLines from '../components/visuals/NodeLines.astro';
 import HeroHeading from '../components/HeroHeading';
-import ProjectList from '../components/ProjectList';
 import { getCollection } from 'astro:content';
 
 // Query featured projects (will return empty array until task 13 creates sample content)
@@ -111,7 +110,7 @@ const featuredProjects = (await getCollection('projects'))
 
       {featuredProjects.length > 0 ? (
         <>
-          <ProjectList client:load>
+          <div class="flex flex-col gap-3">
             {featuredProjects.map((project) => (
               <ProjectEntry
                 title={project.data.title}
@@ -123,7 +122,7 @@ const featuredProjects = (await getCollection('projects'))
                 category={project.data.category}
               />
             ))}
-          </ProjectList>
+          </div>
 
           <div class="mt-8">
             <a
