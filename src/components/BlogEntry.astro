@@ -1,0 +1,51 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  date: Date;
+  tags?: string[];
+  readingTimeMinutes: number;
+  slug: string;
+}
+
+const { title, description, date, tags, readingTimeMinutes, slug } = Astro.props;
+
+const formattedDate = date.toISOString().slice(0, 10);
+---
+
+<article class="border border-border rounded-md p-4 md:p-5 transition-all duration-150 ease-in-out hover:shadow-card hover:border-accent-dim">
+  <div class="flex flex-col gap-2">
+    <!-- Top row: date + reading time -->
+    <div class="flex items-center justify-between gap-2">
+      <time datetime={formattedDate} class="font-mono text-xs text-muted">{formattedDate}</time>
+      <span class="font-mono text-xs text-muted">{readingTimeMinutes} min read</span>
+    </div>
+
+    <!-- Title -->
+    <h3 class="text-base font-semibold text-fg">
+      <a
+        href={`/writing/${slug}`}
+        class="hover:text-accent transition-colors duration-150 ease-in-out"
+      >
+        {title}
+      </a>
+    </h3>
+
+    <!-- Description -->
+    <p class="text-sm text-muted">{description}</p>
+
+    <!-- Tags -->
+    {tags && tags.length > 0 && (
+      <div class="flex flex-wrap gap-1.5 mt-1">
+        {tags.map((tag) => (
+          <a
+            href={`/writing/tag/${tag}`}
+            class="font-mono text-xs px-2 py-0.5 rounded border border-border text-muted hover:text-accent transition-colors duration-150"
+          >
+            {tag}
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</article>

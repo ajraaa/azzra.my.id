@@ -1,0 +1,52 @@
+---
+/**
+ * Projects index page — /projects
+ *
+ * Lists all projects from the Projects Collection, ordered by `date` descending.
+ * Requirements: 4.1, 4.6
+ */
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionLabel from '../../components/SectionLabel.astro';
+import ProjectEntry from '../../components/ProjectEntry.astro';
+import { getCollection } from 'astro:content';
+
+const projects = (await getCollection('projects')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+---
+
+<BaseLayout
+  title="Projects — azzra"
+  description="Engineering work across blockchain, backend, and distributed systems."
+>
+  <main class="max-w-wide mx-auto px-6 md:px-8 py-20">
+    <!-- Page heading -->
+    <div class="mb-12">
+      <SectionLabel label="projects" />
+      <h1 class="text-3xl md:text-4xl font-bold tracking-tight mt-4">Projects</h1>
+      <p class="text-base text-muted mt-3 max-w-content">
+        Engineering work across blockchain, backend, and distributed systems.
+      </p>
+    </div>
+
+    <!-- Projects list -->
+    {projects.length === 0 ? (
+      <p class="text-sm text-muted">No projects yet.</p>
+    ) : (
+      <div class="flex flex-col gap-4">
+        {projects.map((project) => (
+          <ProjectEntry
+            title={project.data.title}
+            summary={project.data.summary}
+            tech={project.data.tech}
+            date={project.data.date}
+            status={project.data.status}
+            category={project.data.category}
+            slug={project.id}
+          />
+        ))}
+      </div>
+    )}
+  </main>
+</BaseLayout>

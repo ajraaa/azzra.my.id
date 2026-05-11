@@ -1,0 +1,85 @@
+---
+/**
+ * Project detail page — /projects/[slug]
+ *
+ * Engineering case study page. Renders a structured CaseStudyHeader above
+ * the MDX body (wrapped in prose typography), with an optional callout
+ * block for `challenges` and `lessons` frontmatter fields rendered below,
+ * visually distinct from the main MDX body.
+ *
+ * Requirements: 4.2, 4.3, 4.4, 4.5
+ */
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CaseStudyHeader from '../../components/CaseStudyHeader.astro';
+import SectionLabel from '../../components/SectionLabel.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+type Props = { project: CollectionEntry<'projects'> };
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const {
+  title,
+  summary,
+  tech,
+  status,
+  category,
+  role,
+  repo,
+  demo,
+  decisions,
+  challenges,
+  lessons,
+} = project.data;
+---
+
+<BaseLayout title={title} description={summary}>
+  <main class="max-w-content mx-auto px-6 md:px-8 py-16">
+    <!-- Structured case study header — Requirement 4.3 -->
+    <CaseStudyHeader
+      title={title}
+      summary={summary}
+      tech={tech}
+      status={status}
+      category={category}
+      role={role}
+      repo={repo}
+      demo={demo}
+      decisions={decisions}
+    />
+
+    <hr class="border-border my-12" />
+
+    <!-- MDX body in prose typography — Requirement 4.4 -->
+    <article class="prose dark:prose-invert max-w-none">
+      <Content />
+    </article>
+
+    <!-- Dedicated callout block for challenges / lessons — Requirement 4.5 -->
+    {(challenges || lessons) && (
+      <aside class="mt-12 space-y-6">
+        {challenges && (
+          <div class="border-l-2 border-accent-dim pl-4 py-4 bg-bg-subtle rounded-r-md">
+            <SectionLabel label="challenges" />
+            <p class="text-sm text-muted mt-2">{challenges}</p>
+          </div>
+        )}
+        {lessons && (
+          <div class="border-l-2 border-accent-dim pl-4 py-4 bg-bg-subtle rounded-r-md">
+            <SectionLabel label="lessons" />
+            <p class="text-sm text-muted mt-2">{lessons}</p>
+          </div>
+        )}
+      </aside>
+    )}
+  </main>
+</BaseLayout>
