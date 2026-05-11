@@ -1,0 +1,47 @@
+---
+title: "IDChain"
+summary: "A blockchain-based decentralized civil registration and population administration system for managing citizen requests, verification workflows, and civil document records."
+tech: ["Solidity", "Hardhat", "JavaScript", "IPFS", "Pinata", "ethers.js"]
+date: 2025-06-01
+status: production
+featured: true
+category: blockchain
+role: "Smart contract architecture, protocol design, backend workflow logic, blockchain integration"
+repo: "https://github.com/ajraaa/idchain"
+demo: "https://azzra-my-id.vercel.app"
+challenges: "Designing a secure and scalable civil administration workflow with multi-level institutional verification while balancing blockchain transparency, privacy, and off-chain document storage."
+lessons: "Careful domain modeling and modular smart contract architecture significantly reduced complexity during feature expansion. Workflow-oriented testing exposed access-control edge cases early in development."
+decisions:
+  - "Separated business logic into modular manager contracts to improve maintainability and scalability."
+  - "Used IPFS with encrypted JSON documents instead of storing sensitive data directly on-chain."
+  - "Implemented region-based access control to restrict verification authority by administrative area."
+  - "Adopted status-driven workflows to support complex multi-stage civil administration processes."
+---
+
+## Problem overview
+
+Conventional civil registration systems are typically centralized, fragmented across institutions, and vulnerable to data inconsistency, limited transparency, and single points of failure. Administrative processes such as birth registration, death reporting, marriage registration, divorce requests, and relocation applications often involve repetitive manual verification and isolated databases between local government offices.
+
+The project aims to explore how blockchain technology can be applied to population administration and civil registration by introducing a decentralized workflow system with transparent verification history, tamper-resistant records, and distributed data validation. The system focuses on enabling citizens, village offices (Kalurahan), and civil registry authorities (Dukcapil) to interact through verifiable on-chain processes while preserving document privacy using hybrid off-chain storage.
+
+## System architecture
+
+The application is built as a decentralized application (dApp) with Ethereum-compatible smart contracts acting as the core workflow engine. The architecture separates concerns into several specialized contracts, including request management, document management, access control, shared type definitions, and utility modules.
+
+The main contract acts as an entry point that delegates logic execution to modular manager contracts. Civil administration requests are represented using a unified `Permohonan` structure containing request metadata, applicant information, verification status, timestamps, and administrative region identifiers.
+
+Verification workflows are implemented using role-based and region-based access control. Certain request types, such as relocation requests, require sequential verification by both the origin and destination village offices before final approval by Dukcapil.
+
+Sensitive civil documents are stored off-chain using IPFS through Pinata as the pinning provider. JSON-based family card (KK) data is encrypted before upload, while only document hashes and references are stored on-chain to preserve integrity without exposing raw personal data publicly on the blockchain.
+
+The system also includes indexing and filtering mechanisms for retrieving requests by status, institution, and administrative region to support operational workflows for government actors.
+
+## Technical decisions
+
+The project uses a modular smart contract architecture instead of a monolithic contract structure to simplify maintenance and future extensibility. Shared data types and reusable workflow utilities are isolated into dedicated modules to reduce duplication and improve readability.
+
+A hybrid storage approach was chosen because storing sensitive civil records entirely on-chain would be impractical in terms of privacy, scalability, and gas cost. Encrypting documents before uploading them to IPFS adds an additional privacy layer while still benefiting from decentralized storage.
+
+The verification workflow uses explicit status transitions and administrative-region validation to prevent unauthorized processing across jurisdictions. Separate mappings are maintained for request indexing based on status and institutional ownership to improve query efficiency.
+
+Hardhat-based testing is used to validate workflow execution, permission enforcement, and request lifecycle behavior. Dummy population data generators were also developed to simulate realistic family structures and support end-to-end testing scenarios for civil registration workflows.
