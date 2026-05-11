@@ -1,17 +1,190 @@
 ---
-import '../styles/global.css';
+/**
+ * Homepage — azzra.my.id
+ * Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 7.5, 7.6
+ */
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionLabel from '../components/SectionLabel.astro';
+import ProjectEntry from '../components/ProjectEntry.astro';
+import DotGrid from '../components/visuals/DotGrid.astro';
+import NodeLines from '../components/visuals/NodeLines.astro';
+import HeroHeading from '../components/HeroHeading';
+import ProjectList from '../components/ProjectList';
+import { getCollection } from 'astro:content';
+
+// Query featured projects (will return empty array until task 13 creates sample content)
+const featuredProjects = (await getCollection('projects'))
+  .filter((p) => p.data.featured)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 3);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout
+  title="azzra — Blockchain & Fullstack Engineer"
+  description="Building decentralized systems and backend infrastructure. Blockchain engineer focused on smart contracts, distributed systems, and scalable architectures."
+>
+  <!-- Hero Section -->
+  <section class="relative py-28 px-6 md:px-8">
+    <div class="max-w-content mx-auto">
+      <!-- DotGrid backdrop -->
+      <div class="absolute inset-0 -z-10">
+        <DotGrid />
+      </div>
+
+      <!-- Animated heading -->
+      <div class="mb-8">
+        <div class="mb-4">
+          <SectionLabel label="engineer" />
+        </div>
+        <HeroHeading
+          client:load
+          name="azzra"
+          role="Blockchain & Fullstack Engineer"
+          statement="Building decentralized systems and backend infrastructure that scale. Focused on smart contract architecture, distributed protocols, and production-grade blockchain applications."
+        />
+      </div>
+
+      <!-- Social links -->
+      <div class="flex gap-4 text-sm">
+        <a
+          href="https://github.com/azzra"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-muted hover:text-accent transition-colors duration-150 ease-in-out"
+        >
+          GitHub ↗
+        </a>
+        <a
+          href="https://linkedin.com/in/azzra"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-muted hover:text-accent transition-colors duration-150 ease-in-out"
+        >
+          LinkedIn ↗
+        </a>
+        <a
+          href="/resume.pdf"
+          class="text-muted hover:text-accent transition-colors duration-150 ease-in-out"
+        >
+          Resume ↗
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Engineering Focus Section -->
+  <section class="py-24 px-6 md:px-8 border-t border-border">
+    <div class="max-w-content mx-auto">
+      <div class="mb-6">
+        <SectionLabel label="focus" />
+      </div>
+
+      <div class="relative">
+        <!-- Optional NodeLines decorative aside -->
+        <div class="hidden md:block absolute -right-8 top-0">
+          <NodeLines />
+        </div>
+
+        <div class="prose prose-invert max-w-none">
+          <p class="text-base text-fg leading-relaxed mb-4">
+            I build blockchain systems that solve real problems. My work spans smart contract architecture, 
+            backend infrastructure for decentralized applications, and the bridges between on-chain and 
+            off-chain systems. I care about security, gas optimization, and designing protocols that developers 
+            can actually use.
+          </p>
+
+          <p class="text-base text-fg leading-relaxed mb-4">
+            On the backend side, I architect systems that handle high throughput, maintain data consistency 
+            across distributed nodes, and integrate with blockchain networks reliably. This includes indexing 
+            infrastructure, API layers for dApps, and event-driven architectures that react to on-chain state 
+            changes in real time.
+          </p>
+
+          <p class="text-base text-fg leading-relaxed">
+            My approach is pragmatic: choose the right tool for the problem, write tests that matter, and 
+            build systems that can be maintained by others. Whether it's Solidity contracts, Go microservices, 
+            or TypeScript backends, the goal is the same — reliable infrastructure that enables decentralized 
+            applications to work at scale.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Selected Work Section -->
+  <section class="py-24 px-6 md:px-8 border-t border-border">
+    <div class="max-w-wide mx-auto">
+      <div class="mb-6">
+        <SectionLabel label="selected work" />
+      </div>
+
+      {featuredProjects.length > 0 ? (
+        <>
+          <ProjectList client:load>
+            {featuredProjects.map((project) => (
+              <ProjectEntry
+                title={project.data.title}
+                summary={project.data.summary}
+                tech={project.data.tech}
+                date={project.data.date}
+                status={project.data.status}
+                slug={project.id}
+                category={project.data.category}
+              />
+            ))}
+          </ProjectList>
+
+          <div class="mt-8">
+            <a
+              href="/projects"
+              class="text-sm text-muted hover:text-accent transition-colors duration-150 ease-in-out"
+            >
+              View all projects →
+            </a>
+          </div>
+        </>
+      ) : (
+        <p class="text-sm text-muted">Featured projects will appear here once content is added.</p>
+      )}
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="py-24 px-6 md:px-8 border-t border-border">
+    <div class="max-w-content mx-auto">
+      <div class="mb-6">
+        <SectionLabel label="contact" />
+      </div>
+
+      <div class="flex flex-col gap-3 text-sm">
+        <a
+          href="mailto:azzra@example.com"
+          class="text-muted hover:text-accent transition-colors duration-150 ease-in-out"
+        >
+          azzra@example.com
+        </a>
+        <div class="flex gap-4">
+          <a
+            href="https://github.com/azzra"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-muted hover:text-accent transition-colors duration-150 ease-in-out"
+          >
+            GitHub
+          </a>
+          <span class="text-border">·</span>
+          <a
+            href="https://linkedin.com/in/azzra"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-muted hover:text-accent transition-colors duration-150 ease-in-out"
+          >
+            LinkedIn
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
