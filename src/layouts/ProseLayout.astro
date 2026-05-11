@@ -1,0 +1,30 @@
+---
+/**
+ * ProseLayout.astro — prose wrapper for MDX content
+ *
+ * Extends BaseLayout and wraps the slot in a typography container
+ * suitable for blog posts and project case study pages.
+ * Requirements: 7.4
+ */
+
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  /** Page title passed through to BaseLayout / SEO */
+  title: string;
+  /** Meta description passed through to BaseLayout / SEO */
+  description: string;
+  /** Absolute URL for og:image */
+  ogImage?: string;
+  /** Canonical URL override */
+  canonicalURL?: string;
+}
+
+const { title, description, ogImage, canonicalURL } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} ogImage={ogImage} canonicalURL={canonicalURL}>
+  <div class="prose dark:prose-invert max-w-content mx-auto px-6 md:px-8 py-12">
+    <slot />
+  </div>
+</BaseLayout>

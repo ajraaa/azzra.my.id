@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion, type Transition } from 'framer-motion';
 
 type Theme = 'light' | 'dark';
 
@@ -81,9 +81,9 @@ export default function ThemeToggle() {
     }
   }
 
-  const transition = prefersReducedMotion
+  const transition: Transition = prefersReducedMotion
     ? { duration: 0 }
-    : { duration: 0.15, ease: 'easeInOut' };
+    : { duration: 0.15, ease: 'easeInOut' as const };
 
   return (
     <button

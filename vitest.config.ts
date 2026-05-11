@@ -17,6 +17,10 @@ import { getViteConfig } from 'astro/config';
  *   npm run test:component   — `unit` project scoped to `tests/component/**`
  *   npm run test:dist        — `dist` project scoped to `tests/dist/**`
  */
+
+// `getViteConfig` types don't expose the `test` key, but it is passed through
+// to Vitest at runtime. The cast to `any` avoids a spurious TS2353 error.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default getViteConfig({
   test: {
     // Root-level options inherited by every project via `extends: true`.
@@ -51,4 +55,4 @@ export default getViteConfig({
       },
     ],
   },
-});
+} as any);
