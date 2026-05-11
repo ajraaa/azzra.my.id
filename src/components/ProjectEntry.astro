@@ -1,0 +1,51 @@
+---
+import TechBadge from './TechBadge.astro';
+import StatusBadge from './StatusBadge.astro';
+
+interface Props {
+  title: string;
+  summary: string;
+  tech: string[];
+  date: Date;
+  status: 'production' | 'archived' | 'in-progress';
+  slug: string;
+  category?: string;
+}
+
+const { title, summary, tech, date, status, slug, category } = Astro.props;
+
+const formattedDate = date.toISOString().slice(0, 7);
+---
+
+<article class="border border-border rounded-md p-4 md:p-5 transition-all duration-150 ease-in-out hover:shadow-card hover:border-accent-dim">
+  <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 md:gap-6">
+    <!-- Left: status + title + summary -->
+    <div class="flex flex-col gap-1.5">
+      <div>
+        <StatusBadge status={status} />
+      </div>
+      <h3 class="text-base font-semibold text-fg">{title}</h3>
+      <p class="text-sm text-muted">{summary}</p>
+    </div>
+
+    <!-- Right: category + tech badges + date + link -->
+    <div class="flex flex-col gap-2 md:items-end md:text-right">
+      {category && (
+        <span class="font-mono text-xs text-muted">{category}</span>
+      )}
+      <div class="flex flex-wrap gap-1.5 md:justify-end">
+        {tech.map((t) => <TechBadge tech={t} />)}
+      </div>
+      <div class="flex items-center gap-2 md:justify-end">
+        <span class="font-mono text-xs text-muted">{formattedDate}</span>
+        <a
+          href={`/projects/${slug}`}
+          aria-label={`View ${title} case study`}
+          class="text-muted hover:text-accent transition-colors duration-150 ease-in-out text-sm leading-none"
+        >
+          ↗
+        </a>
+      </div>
+    </div>
+  </div>
+</article>
