@@ -1,0 +1,64 @@
+---
+import ThemeToggle from './ThemeToggle';
+
+interface NavLink {
+  label: string;
+  href: string;
+}
+
+const navLinks: NavLink[] = [
+  { label: 'Home',     href: '/'         },
+  { label: 'Projects', href: '/projects' },
+  { label: 'Writing',  href: '/writing'  },
+  { label: 'Contact',  href: '/#contact' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header
+  class="sticky top-0 z-50 border-b border-border bg-bg/90 backdrop-blur-sm"
+>
+  <nav
+    class="mx-auto flex max-w-[1024px] items-center justify-between px-6 py-4 md:px-8"
+    aria-label="Main navigation"
+  >
+    <!-- Logo / name -->
+    <a
+      href="/"
+      class="font-mono text-sm font-semibold text-fg transition-colors duration-150 ease-in-out hover:text-accent"
+      aria-label="Home"
+    >
+      azzra.my.id
+    </a>
+
+    <!-- Nav links + theme toggle -->
+    <div class="flex items-center gap-6">
+      <ul class="flex items-center gap-6 list-none m-0 p-0" role="list">
+        {navLinks.map(({ label, href }) => {
+          const isActive =
+            href === '/'
+              ? currentPath === '/'
+              : currentPath.startsWith(href.replace('/#contact', ''));
+
+          return (
+            <li>
+              <a
+                href={href}
+                class:list={[
+                  'text-sm transition-colors duration-150 ease-in-out hover:text-accent',
+                  isActive ? 'text-fg font-medium' : 'text-muted',
+                ]}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                {label}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+
+      <ThemeToggle client:load />
+    </div>
+  </nav>
+</header>

@@ -1,0 +1,36 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-border mt-auto">
+  <div class="max-w-wide mx-auto px-6 md:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <p class="text-muted text-sm font-mono">
+      azzra &copy; {year}
+    </p>
+    <nav aria-label="Footer links" class="flex items-center gap-5">
+      <a
+        href="https://github.com/azzra"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-muted text-sm transition-colors duration-150 ease-in-out hover:text-accent"
+      >
+        GitHub
+      </a>
+      <a
+        href="https://linkedin.com/in/azzra"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-muted text-sm transition-colors duration-150 ease-in-out hover:text-accent"
+      >
+        LinkedIn
+      </a>
+      <a
+        href="/rss.xml"
+        class="text-muted text-sm transition-colors duration-150 ease-in-out hover:text-accent"
+        aria-label="RSS feed"
+      >
+        RSS
+      </a>
+    </nav>
+  </div>
+</footer>

@@ -1,0 +1,47 @@
+---
+/**
+ * SEO component — emits <title>, <meta name="description">, Open Graph tags,
+ * and <link rel="canonical"> for every page.
+ *
+ * Requirements: 8.1, 8.2, 8.3
+ */
+
+interface Props {
+  /** Page title — will be appended with site name */
+  title: string;
+  /** Meta description and og:description */
+  description: string;
+  /** Absolute URL for og:image. Defaults to /og-default.png */
+  ogImage?: string;
+  /** Canonical URL. Defaults to the current page URL (Astro.url). */
+  canonicalURL?: string | URL;
+}
+
+const SITE_NAME = "azzra.my.id";
+const BASE_URL = "https://azzra.my.id";
+const DEFAULT_OG_IMAGE = `${BASE_URL}/og-default.png`;
+
+const {
+  title,
+  description,
+  ogImage = DEFAULT_OG_IMAGE,
+  canonicalURL = Astro.url,
+} = Astro.props;
+
+const canonical = new URL(canonicalURL, BASE_URL).href;
+const ogImageURL = ogImage.startsWith("http") ? ogImage : new URL(ogImage, BASE_URL).href;
+const pageTitle = `${title} — ${SITE_NAME}`;
+---
+
+<!-- Primary meta -->
+<title>{pageTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+
+<!-- Open Graph -->
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:type" content="website" />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImageURL} />
+<meta property="og:site_name" content={SITE_NAME} />

@@ -16,6 +16,7 @@
     "test:dist": "vitest --run --project dist tests/dist"
   },
   "dependencies": {
+    "@astrojs/check": "^0.9.9",
     "@astrojs/mdx": "latest",
     "@astrojs/react": "latest",
     "@astrojs/rss": "latest",
@@ -27,7 +28,8 @@
     "react": "latest",
     "react-dom": "latest",
     "sharp": "latest",
-    "tailwindcss": "^4.2.1"
+    "tailwindcss": "^4.2.1",
+    "typescript": "^6.0.3"
   },
   "devDependencies": {
     "@fast-check/vitest": "^0.4.1",
