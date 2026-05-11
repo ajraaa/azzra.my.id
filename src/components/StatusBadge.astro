@@ -1,0 +1,17 @@
+---
+interface Props {
+  status: 'production' | 'in-progress' | 'archived';
+}
+
+const { status } = Astro.props;
+
+const variantClasses: Record<Props['status'], string> = {
+  'production':  'border-accent-dim text-accent',
+  'in-progress': 'border-amber-700/40 text-amber-400',
+  'archived':    'border-border text-muted',
+};
+---
+
+<span class={`font-mono text-xs px-2 py-0.5 rounded border ${variantClasses[status]}`}>
+  {status}
+</span>

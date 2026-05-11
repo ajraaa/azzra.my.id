@@ -1,0 +1,77 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* ─── Dark Mode Variant ──────────────────────────────────────────────────── */
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ─── Design Tokens ─────────────────────────────────────────────────────── */
+
+/* Dark theme (default) */
+:root,
+[data-theme="dark"] {
+  --bg:         222 18% 7%;
+  --bg-subtle:  222 16% 10%;
+  --border:     222 14% 16%;
+  --fg:         210 18% 88%;
+  --muted:      215 12% 50%;
+  --accent:     195 58% 50%;
+  --accent-dim: 195 40% 30%;
+  --code-fg:    150 28% 58%;
+}
+
+/* Light theme */
+[data-theme="light"] {
+  --bg:         210 22% 97%;
+  --bg-subtle:  210 18% 93%;
+  --border:     215 14% 86%;
+  --fg:         222 20% 12%;
+  --muted:      215 12% 44%;
+  --accent:     195 55% 36%;
+  --accent-dim: 195 40% 88%;
+  --code-fg:    150 28% 32%;
+}
+
+/* ─── Tailwind v4 Theme Tokens ───────────────────────────────────────────── */
+
+@theme {
+  /* Colors — reference CSS custom properties */
+  --color-bg:         hsl(var(--bg) / <alpha-value>);
+  --color-bg-subtle:  hsl(var(--bg-subtle) / <alpha-value>);
+  --color-border:     hsl(var(--border) / <alpha-value>);
+  --color-fg:         hsl(var(--fg) / <alpha-value>);
+  --color-muted:      hsl(var(--muted) / <alpha-value>);
+  --color-accent:     hsl(var(--accent) / <alpha-value>);
+  --color-accent-dim: hsl(var(--accent-dim) / <alpha-value>);
+  --color-code-fg:    hsl(var(--code-fg) / <alpha-value>);
+
+  /* Font families */
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+
+  /* Max widths */
+  --max-width-content: 768px;
+  --max-width-wide:    1024px;
+
+  /* Box shadow */
+  --shadow-card: 0 1px 3px hsl(var(--border) / 0.6), 0 4px 16px hsl(var(--border) / 0.3);
+}
+
+/* ─── Base Typography ────────────────────────────────────────────────────── */
+
+body {
+  font-family: Inter, system-ui, sans-serif;
+  line-height: 1.6;
+  color: hsl(var(--fg));
+  background-color: hsl(var(--bg));
+}
+
+/* ─── Reduced Motion ─────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0ms !important;
+  }
+}
