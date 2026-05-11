@@ -74,6 +74,9 @@ export default function ThemeToggle() {
     const next: Theme = theme === 'dark' ? 'light' : 'dark';
     setTheme(next);
     document.documentElement.dataset.theme = next;
+    // Keep browser chrome / mobile status bar in sync
+    const themeColor = next === 'light' ? '#f4f6f8' : '#0d0f14';
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor);
     try {
       localStorage.setItem('theme', next);
     } catch (_) {
