@@ -1,0 +1,69 @@
+---
+/**
+ * Writing index page — /writing
+ *
+ * Lists all non-draft blog posts sorted by date descending, with a tag filter
+ * row derived from the union of tags across posts.
+ * Requirements: 6.1, 6.2
+ */
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionLabel from '../../components/SectionLabel.astro';
+import BlogEntry from '../../components/BlogEntry.astro';
+import { getCollection } from 'astro:content';
+import { readingTime } from '../../lib/readingTime';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+
+const allTags = [...new Set(posts.flatMap((p) => p.data.tags ?? []))].sort();
+---
+
+<BaseLayout
+  title="Writing — azzra"
+  description="Technical notes on blockchain systems, distributed architecture, and engineering practice."
+>
+  <main class="max-w-wide mx-auto px-6 md:px-8 py-20">
+    <!-- Page heading -->
+    <div class="mb-8">
+      <SectionLabel label="writing" />
+      <h1 class="text-3xl md:text-4xl font-bold tracking-tight mt-4">Writing</h1>
+      <p class="text-base text-muted mt-3 max-w-content">
+        Technical notes on blockchain systems, distributed architecture, and engineering practice.
+      </p>
+    </div>
+
+    <!-- Tag filter row -->
+    {allTags.length > 0 && (
+      <div class="flex flex-wrap gap-2 mt-8">
+        {allTags.map((tag) => (
+          <a
+            href={`/writing/tag/${tag}`}
+            class="font-mono text-xs px-2 py-0.5 rounded border border-border text-muted hover:text-accent transition-colors duration-150"
+          >
+            {tag}
+          </a>
+        ))}
+      </div>
+    )}
+
+    <!-- Posts list -->
+    {posts.length === 0 ? (
+      <p class="text-sm text-muted mt-12">No posts yet.</p>
+    ) : (
+      <div class="flex flex-col gap-4 mt-12">
+        {posts.map((post) => (
+          <BlogEntry
+            title={post.data.title}
+            description={post.data.description}
+            date={post.data.date}
+            tags={post.data.tags}
+            readingTimeMinutes={readingTime(post.body ?? '')}
+            slug={post.id}
+          />
+        ))}
+      </div>
+    )}
+  </main>
+</BaseLayout>

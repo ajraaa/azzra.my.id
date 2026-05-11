@@ -1,0 +1,73 @@
+---
+/**
+ * Tag-filtered writing page — /writing/tag/[tag]
+ *
+ * Generates one static page per unique tag found across non-draft posts,
+ * and lists all posts matching that tag.
+ *
+ * Requirements: 6.2
+ */
+
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionLabel from '../../../components/SectionLabel.astro';
+import BlogEntry from '../../../components/BlogEntry.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { readingTime } from '../../../lib/readingTime';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  const tagSet = new Set<string>();
+  posts.forEach((post) => {
+    (post.data.tags ?? []).forEach((tag) => tagSet.add(tag));
+  });
+  const tags = [...tagSet];
+  return tags.map((tag) => ({
+    params: { tag },
+    props: {
+      tag,
+      posts: posts
+        .filter((p) => (p.data.tags ?? []).includes(tag))
+        .sort((a, b) => b.data.date.getTime() - a.data.date.getTime()),
+    },
+  }));
+}
+
+type Props = { tag: string; posts: CollectionEntry<'blog'>[] };
+
+const { tag, posts } = Astro.props;
+---
+
+<BaseLayout
+  title={`Writing tagged "${tag}" — azzra`}
+  description={`Posts tagged ${tag}.`}
+>
+  <main class="max-w-wide mx-auto px-6 md:px-8 py-20">
+    <!-- Header block -->
+    <div class="mb-8">
+      <SectionLabel label={`tag / ${tag}`} />
+      <h1 class="text-3xl md:text-4xl font-bold tracking-tight mt-4">
+        Tagged: <span class="font-mono">{tag}</span>
+      </h1>
+      <a
+        href="/writing"
+        class="text-sm text-muted hover:text-accent transition-colors duration-150 inline-block mt-3"
+      >
+        ← All writing
+      </a>
+    </div>
+
+    <!-- Posts list -->
+    <div class="flex flex-col gap-4 mt-12">
+      {posts.map((post) => (
+        <BlogEntry
+          title={post.data.title}
+          description={post.data.description}
+          date={post.data.date}
+          tags={post.data.tags}
+          readingTimeMinutes={readingTime(post.body ?? '')}
+          slug={post.id}
+        />
+      ))}
+    </div>
+  </main>
+</BaseLayout>
