@@ -7,7 +7,6 @@ interface NavLink {
 }
 
 const navLinks: NavLink[] = [
-  { label: 'Home',     href: '/'         },
   { label: 'Projects', href: '/projects' },
   { label: 'Writing',  href: '/writing'  },
   { label: 'Contact',  href: '/#contact' },
@@ -35,8 +34,8 @@ const links: NavLink[] = navLinks;
     </a>
 
     <!-- Nav links + theme toggle -->
-    <div class="flex items-center gap-6">
-      <ul class="flex items-center gap-6 list-none m-0 p-0" role="list">
+    <div class="flex items-center gap-4">
+      <ul class="flex items-center gap-4 list-none m-0 p-0" role="list">
         {links.map(({ label, href }) => {
           const isActive =
             href === '/'
