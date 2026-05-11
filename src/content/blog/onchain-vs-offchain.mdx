@@ -1,0 +1,78 @@
+---
+title: "Why I Didn’t Store Civil Documents Directly On-Chain"
+description: "What building a blockchain-based civil registration system taught me about privacy, transparency, and practical system design."
+date: 2026-02-05
+tags: ["blockchain", "solidity", "ipfs", "privacy", "smart-contracts"]
+draft: false
+---
+
+When I first started building a blockchain-based civil registration system for my thesis project, I was fascinated by the idea of putting everything on-chain.
+
+At the time, it felt like the “correct” way to build a decentralized application. If blockchain is immutable, transparent, and distributed, then storing all citizen records directly on-chain seemed like the most decentralized approach possible.
+
+But the longer I worked on the system, the more uncomfortable that idea became.
+
+The project handles administrative processes such as birth registration, death reporting, marriage records, and relocation requests. Those workflows involve documents that are deeply personal: family records, identity information, addresses, and other sensitive data people normally expect governments to protect carefully.
+
+That was the moment I started asking a different question.
+
+Not *“Can this data be stored on-chain?”*
+
+But instead:
+
+*“Should it be?”*
+
+Public blockchains are transparent by design. Anything written into contract storage becomes visible to everyone and replicated across every participating node in the network. Even if the data is encrypted beforehand, the encrypted payload still becomes permanently public and permanently stored.
+
+That permanence matters more when the system involves real people rather than abstract financial transactions.
+
+A typo in a civil document can happen. An uploaded file might later need correction. Privacy expectations can change over time. Once sensitive data is embedded directly into a blockchain, reversing that decision becomes extremely difficult.
+
+There is also the practical side of it.
+
+Smart contract storage is expensive and inefficient for large files. The EVM was never designed to function as a general-purpose database for documents.
+
+```solidity
+contract CitizenData {
+    string public document;
+}
+```
+
+Technically possible does not automatically mean technically responsible.
+
+Eventually, I moved toward a hybrid architecture instead.
+
+The system stores only the minimum information required for verification on-chain. Things like hashes, document references, workflow status, timestamps, and verification history.
+
+The actual files are encrypted before upload and stored through IPFS.
+
+```solidity
+struct Dokumen {
+    string ipfsCid;
+    bytes32 documentHash;
+}
+```
+
+That decision changed the role of the blockchain entirely.
+
+The blockchain became less of a storage system and more of a trust layer.
+
+Its job is no longer to expose every document publicly. Its job is to prove that:
+- a document existed,
+- a request was verified,
+- a workflow happened,
+- and the stored file has not been altered.
+
+That distinction ended up being one of the most important lessons from the project.
+
+I think a lot of blockchain discussions become trapped in absolutes fully decentralized versus centralized, on-chain versus off-chain, immutable versus editable. Real systems are usually more nuanced than that, especially systems involving human institutions and personal data.
+
+Building software for civil administration made me think less about “maximizing decentralization” and more about responsibility.
+
+People do not care whether a storage architecture sounds ideologically pure. They care whether their personal information is safe, whether the system is reliable, and whether mistakes can still be handled realistically.
+
+In the end, the most useful insight I gained from the project was this:
+
+Good blockchain engineering is often not about putting more data on-chain.
+
+It is about understanding what *should* stay off-chain.
