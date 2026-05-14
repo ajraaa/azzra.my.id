@@ -92,7 +92,7 @@ export default function ThemeToggle() {
       type="button"
       onClick={toggleTheme}
       aria-label="Toggle theme"
-      className="relative p-2 rounded text-muted hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent transition-colors duration-150"
+      className="relative p-2 rounded text-muted hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent transition-colors duration-150 cursor-pointer"
     >
       <span className="relative block w-4 h-4">
         <AnimatePresence mode="wait" initial={false}>
