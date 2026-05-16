@@ -1,0 +1,52 @@
+---
+title: "BTC DCA Tracker"
+summary: "A real-time Bitcoin Dollar-Cost Averaging (DCA) monitoring and portfolio management application featuring automated price synchronization, data integrity protection, and optimized time-series performance visualization."
+tech: ["Next.js", "TypeScript", "Tailwind CSS", "Supabase", "PostgreSQL", "Recharts", "CoinGecko API"]
+date: 2026-02-12
+status: production
+featured: true
+category: web-development
+role: "Full-stack development, database architecture, API integration, data downsampling optimization, state management"
+repo: "https://github.com/ajraaa/btc-dca-tracker"
+demo: "https://azzra-my-id.vercel.app"
+challenges: "Overcoming third-party API rate limits (HTTP 429) and browser CORS restrictions, preventing division-by-zero crashes caused by micro-decimal precision math, and efficiently rendering thousands of historical data points on mobile viewports without dragging UI responsiveness."
+lessons: "Implementing defensive programming directly at the database layer via constraints and views guarantees absolute data integrity before reaching the frontend. Additionally, utilizing downsampling algorithms like LTTB is paramount for maintaining smooth rendering of time-series charts in modern web apps."
+decisions:
+  - "Architected server-side API Routes as a proxy for CoinGecko endpoints to bypass browser CORS and mitigate rate limiting via shared server-side caching."
+  - "Implemented the Largest Triangle Three Buckets (LTTB) algorithm to downsample historical Bitcoin price data while preserving critical visual trends (peaks and troughs)."
+  - "Designed a custom 'Preserve Purchases' merging algorithm to ensure user DCA execution data points are never dropped or shifted during chart downsampling."
+  - "Utilized database CHECK constraints and combined SQL View calculation blocks with NULLIF/COALESCE to immunize financial math from micro-decimal (Satoshi) calculation crashes."
+  - "Optimized viewport-fit, theme-color, and root HTML/CSS parameters to counteract iOS Safari elastic overscroll bounce and status bar color mismatches."
+---
+
+## Problem overview
+
+Investors practicing a Dollar-Cost Averaging (DCA) strategy on Bitcoin frequently struggle to track the actual performance and efficacy of their accumulation over time. Conventional portfolio asset trackers often fail to handle micro-precision entries down to the Satoshi level and rarely offer clear visual feedback showing the exact execution positions plotted directly atop long-term market trends.
+
+Furthermore, relying entirely on client-side requests to public third-party APIs risks continuous service interruptions due to Cross-Origin Resource Sharing (CORS) blocks and strict rate limiting (HTTP 429 errors) caused by routine price polling. This project aims to build a highly responsive, secure, and resilient personal Bitcoin DCA tracking dashboard that mirrors the institutional visual accumulation approach popularized by MicroStrategy.
+
+## System architecture
+
+The application is built as a full-stack web application leveraging an interactive Client-Side Rendering experience backed by robust server-side data proxying and database computation. The architecture deliberately segregates concerns among the frontend visualization layer, server-side data brokers, and database financial computation engines.
+
+At the core, Supabase (PostgreSQL) handles relational storage. Data integrity boundaries are enforced natively using database constraints to reject anomalies like negative values or future timestamps. To keep queries exceptionally lean, long-term portfolio metrics are not calculated or reduced on the frontend; instead, they are offloaded to a dynamic database SQL View (`dca_summary`). This engine uses real-time aggregation to surface key metrics—total capital invested, total accumulated BTC, and current average cost basis—instantly.
+
+These values feed the Next.js frontend via server-side pagination. The UI provides dynamic runtime controls, including an instantaneous currency toggle between IDR and USD. When toggled, the entire interface—from Summary Cards to historical charts—scales on-the-fly using live exchange rates fetched across the system.
+
+## Technical decisions
+
+The following strategic technical choices were implemented to tackle performance barriers and protect financial computation logic:
+
+### Server-Side API Proxying & Caching
+To bypass client-side CORS limitations and protect the platform against CoinGecko rate blocks during active user interactions, data fetching was shifted to Server-Side API Routes (`/api/price` and `/api/history`). Leveraging Next.js `next: { revalidate }` configurations, the server functions as an intelligent proxy that caches market endpoints (30 seconds for spot pricing, 1 hour for historical charts). When multiple users access the dashboard concurrently, the server hits the external API once and distributes the cached response, effectively driving down external API request overhead by over 90%.
+
+### LTTB Downsampling with a "Preserve Purchases" Pipeline
+Displaying a comprehensive Bitcoin price chart over extensive horizons (e.g., 10 years) involves handling upwards of 3,650 time-series coordinate pairs. Forcing the browser to render thousands of DOM elements into an SVG canvas (via Recharts) causes severe UI latency and stuttering, especially on low-powered mobile devices.
+
+This was resolved by executing the **Largest Triangle Three Buckets (LTTB)** algorithm to downsample the stream down to an optimal resolution (~350 nodes on desktop, ~150 nodes on mobile viewports). Unlike moving averages which smooth out volatility, LTTB retains visual extrema (all historical peaks and troughs). To prevent vital user-specific data from being discarded during downsampling, a custom parsing routine filters and appends actual transaction dates back into the post-LTTB array, ensuring the gold execution markers map with absolute pixel precision onto the market curve.
+
+### Defensive Floating-Point Math
+Handling crypto ledger metrics out to 8 or more decimal places frequently runs into binary floating-point precision constraints in JavaScript or division-by-zero fatal exceptions in SQL queries if active holdings sit near absolute zero. A defensive programming methodology was introduced within the underlying database view by isolating the math divisor using `NULLIF(SUM(btc_amount), 0)` nested inside a fallback `COALESCE` handler. If transaction entries total up to zero or yield microscopic floats, the platform handles the result silently and falls back to a clean 0 instead of dropping database execution frames or breaking frontend layout trees.
+
+### Native-Like iOS Safari Experience
+To emulate the immersive interface of a native mobile app when accessed via mobile Safari, the fundamental root elements (`<html>` and `<body>`) are fixed to matching dark backgrounds to swallow up the distracting white canvas usually exposed during iOS's elastic overscroll bounce. The layout leverages a `viewport-fit=cover` declaration to let header components safely ascend past physical device notches, while actively dynamically synchronizing the native system status bar text and indicators using explicit `theme-color` headers.
