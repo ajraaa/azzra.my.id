@@ -1,0 +1,46 @@
+---
+title: "Step to Work"
+summary: "An AI-powered, ATS-friendly CV generator featuring a hybrid Astro-React Islands Architecture with a real-time vector PDF preview and dynamic layout customization."
+tech: ["Astro", "React", "TypeScript", "@react-pdf/renderer", "Nano Stores", "Tailwind CSS"]
+date: 2026-05-15
+status: in-progress
+featured: true
+category: fullstack
+role: "Hybrid framework integration, reactive state design, dynamic layout engine, full-stack architecture"
+repo: "https://github.com/ajraaa/step-to-work"
+demo: "https://step-to-work.vercel.app"
+challenges: "Balancing instant interactive performance during user data entry with the heavy computation required for live vector PDF layouting, while maintaining an inclusive UI for non-technical users."
+lessons: "Leveraging framework-agnostic state bridges like Nano Stores eliminates framework lock-in and enables clean communication between isolated DOM islands. Separating layout metadata from content stores prevents unnecessary re-rendering cycles."
+decisions:
+  - "Adopted Astro's Islands Architecture to minimize initial client-side JavaScript bundle sizes for form management."
+  - "Utilized React with @react-pdf/renderer to provide a true 100% WYSIWYG vector preview, eliminating HTML-to-PDF parsing mismatches."
+  - "Decoupled application state into independent stores for data content and layout styling to respect Separation of Concerns."
+  - "Enforced strictly bounded layout constraints (margins, font scales, line heights) to guarantee ATS compliance regardless of user customization."
+---
+
+## Problem overview
+
+As a fresh Computer Science graduate stepping into the competitive professional job market, understanding the cryptic mechanics of an Applicant Tracking System (ATS) initially felt like a massive hurdle. There was a glaring lack of clarity on how to format a resume properly—from safe margin boundaries and typography choices to how automated parsers extract technical skills. The overwhelming ambiguity around creating a technically compliant resume became the primary catalyst for this project.
+
+Step to Work was conceived as a dual-purpose endeavor: a hands-on portfolio project to showcase full-stack engineering capabilities, and a practical deep-dive into reverse-engineering ATS standards. Instead of just reading about resume guidelines, the goal was to build an automated, guardrailed system that programmatically enforces those rules. By turning the personal challenge of transition from student to professional into a software product, the project provides a universal tool that guides users away from layout mistakes while acting as a living proof of technical competence.
+
+## System architecture
+
+The application is structured as a high-performance web platform utilizing Astro's Islands Architecture. Instead of building a heavy Single Page Application (SPA), the system isolates concerns between lightweight, server-rendered HTML components and highly reactive client-side islands.
+
+The left-hand workspace contains a multi-step resume form managed primarily by Astro components. As the user inputs text into these form fields, Vanilla JavaScript event listeners capture the input and instantly broadcast updates to a centralized, framework-agnostic Nano Store (`cvStores.ts`). The right-hand workspace operates as an independent React island hosting the live document preview powered by `@react-pdf/renderer`. This React engine continuously subscribes to the Nano Store, automatically recalculating text-wrapping and dynamic page divisions in a genuine PDF context without blocking the user's typing flow.
+
+To handle deep layout personalization, the editor integrates a context-switching management system. Driven by a dedicated `uiStore.ts`, a custom Astro tab switcher toggles the display state of the left panel. When switched to layout mode, the static Astro forms are hidden from view, and a React-based slider console is exposed. This configuration console directly mutates a separate `styleStore.ts`, which injects updated properties directly into the PDF engine's dynamic stylesheet compilation.
+
+## Technical decisions
+
+The decision to implement a hybrid Astro-React architecture was made to prioritize optimal Core Web Vitals while maintaining heavy rendering capabilities. Building the data entry fields in Astro keeps the DOM incredibly lightweight, while React is strictly reserved for the complex lifecycle of the virtual PDF document.
+
+State serialization is strictly decoupled. By isolating the layout properties into `styleStore.ts` and resume content into `cvStores.ts`, font size tweaks or padding adjustments do not trigger heavy data parsing or string evaluation across the text input fields. 
+
+To ensure complete ATS friendliness, the customization sliders reject arbitrary input ranges. The sliders are engineered with strict, mathematically bounded constraints:
+* **Page Padding:** Locked between `20pt` and `50pt` to prevent document text from clipping outside printer-safe margins.
+* **Base Font Size:** Restricted to a tight `9pt` to `12pt` threshold, ensuring it remains highly readable for optical character recognition (OCR) software.
+* **Line Height:** Constrained between `1.1` and `1.7` to eliminate any overlapping descenders on characters like 'g', 'j', and 'y'.
+
+The dynamic skill category system uses an array-of-objects structure, shifting away from standard monolithic strings. This allows the PDF compilation engine to seamlessly execute map loops that dynamically generate multi-column skill headers. These headers can be modified or renamed by the user in real-time, making the platform agnostic to any specific job industry.
