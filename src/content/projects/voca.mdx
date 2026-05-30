@@ -1,0 +1,79 @@
+---
+title: "Voca"
+summary: "A reward-based survey platform that helps people or businesses collect high-quality feedback quickly through validated respondents, response quality scoring, anti-fraud mechanisms, and data-driven survey optimization."
+tech: ["Next.js", "TypeScript", "Supabase", "PostgreSQL", "Tailwind CSS"]
+date: 2026-04-27
+status: in-progress
+featured: false
+category: fullstack
+role: "Respondent workflow architecture, response management system, autosave mechanism, response validation, quality scoring integration, survey completion experience"
+repo: "https://github.com/ajraaa/voca-app"
+demo: "https://azzra-my-id.vercel.app"
+challenges: "Designing a reliable respondent experience that prevents data loss, supports long-running surveys, enforces response quality validation, and integrates reward calculation while maintaining a smooth user experience."
+lessons: "Separating draft management, answer persistence, and submission validation into independent stages significantly improved reliability and maintainability. Building database-driven validation reduced inconsistencies between frontend and backend workflows."
+decisions:
+  - "Implemented a draft-based response workflow with autosave and resume capabilities."
+  - "Used PostgreSQL RPC functions as the primary source of truth for response validation and submission logic."
+  - "Separated answer persistence from final submission to improve reliability and reduce data loss."
+  - "Integrated quality-scoring and reward-calculation mechanisms directly into the submission lifecycle."
+---
+
+## Problem overview
+
+The initial idea behind Voca came from the rapid growth of AI-assisted application development. Today, more people, including non-technical users, can build applications faster using AI tools. However, after building an application, they still need real users to test it, provide feedback, and validate whether the product is actually useful.
+
+This creates a need for a platform that connects creators with respondents who are willing to try products, complete surveys, and give structured feedback. Voca was designed to support this process through a reward-based feedback system, where creators can collect responses from validated users while respondents receive incentives for their participation.
+
+My main focus in this project was building the respondent-side flow, including draft response handling, autosave, response submission, quality validation, and reward feedback. The goal was to make the survey experience reliable, smooth, and trustworthy for users who participate as respondents.
+
+## System architecture
+
+My primary contribution focused on the respondent-side architecture. The workflow was designed around reliability, data integrity, and quality assurance to ensure that survey responses could be collected safely even when users left and returned to surveys multiple times.
+
+## Respondent workflow
+
+The respondent experience is built around a draft-based architecture that separates answer persistence from final survey submission.
+
+The workflow consists of:
+
+1. Start survey
+2. Create draft response
+3. Autosave answers
+4. Restore unfinished drafts
+5. Validate completion requirements
+6. Submit response
+7. Calculate quality score
+8. Determine reward eligibility
+9. Return submission feedback
+
+Each answer is stored incrementally through autosave operations, allowing respondents to leave and resume surveys without losing progress. The final submission process performs validation, scoring, reward calculation, and anti-fraud checks before a response is accepted.
+
+This architecture reduces the risk of data loss while ensuring that survey quality rules remain enforced through database-level validation.
+
+## Technical decisions
+
+A draft-based response architecture was selected instead of a traditional single-submit approach. Survey answers are saved incrementally throughout the completion process, allowing recovery from accidental page refreshes, browser crashes, or network interruptions.
+
+The submission workflow was implemented using PostgreSQL RPC functions to centralize business rules inside the database. Critical operations such as ownership validation, response completeness checks, quality scoring, and reward calculation are executed within the database layer to ensure consistency regardless of the client application.
+
+Autosave functionality includes answer persistence, draft restoration, save-state feedback, and submission safeguards to prevent users from submitting surveys while pending saves or validation failures exist.
+
+## Response quality and anti-fraud mechanisms
+
+To maintain dataset quality, Voca incorporates multiple quality-control measures throughout the response lifecycle.
+
+The validation system evaluates factors such as:
+
+- Response completeness
+- Answer consistency
+- Response duration
+- Attention checks
+- Quality scoring
+
+Each response is categorized into statuses such as:
+
+- Valid
+- Low quality
+- Rejected
+
+Reward distribution is determined based on the final validation outcome, encouraging respondents to provide thoughtful and accurate answers while discouraging spam or low-effort participation.
