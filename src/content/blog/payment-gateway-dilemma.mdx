@@ -1,0 +1,69 @@
+---
+title: "The Payment Gateway Dilemma: Why Voca Pivot from Midtrans to Xendit"
+description: "What building a reward-based survey platform taught me about compliance, developer-first sandboxes, and the friction of micro-transactions in Indonesia."
+date: 2026-06-01
+tags: ["saas", "nextjs", "payment-gateway", "xendit", "midtrans"]
+draft: false
+---
+
+When designing the core architecture of Voca, a reward-based survey platform, I knew that the money movement layer would make or break the product. The ecosystem requires two distinct financial flows: a seamless Pay-In system for creators to fund their survey campaigns, and a high-frequency, reliable Pay-Out (Disbursement) system to distribute micro-rewards to validated respondents.
+
+In the Indonesian payment gateway landscape, two giants immediately stood out: Midtrans and Xendit. 
+
+Naturally, my first instinct was to implement Midtrans. It’s highly reputable, backed by GoTo Financial, and possesses an incredibly mature ecosystem. In my mind, integrating Midtrans felt like the “standard” roadmap for any local SaaS application.
+
+But the moment I moved past the basic payment acceptance layer and tried to wire the respondent withdraw workflow, I hit a massive compliance brick wall.
+
+The project handles sensitive financial routing. When a respondent completes a survey, passes our quality scoring, and requests a withdrawal, the system needs to trigger an automated API call to disburse those funds immediately. Midtrans handles this through their Iris product. 
+
+However, trying to enable Iris in the sandbox environment threw a frustrating roadblock:
+
+```text
+HTTP 422 The change you wanted was rejected.
+
+```
+
+That was the moment I realized a painful truth about local fintech engineering. Even in a sandbox environment meant purely for testing, some platforms enforce strict corporate compliance structures. Midtrans Iris assumes your account is tied to a legally registered business entity (PT/CV) from day one. If you are an independent developer building an MVP, a thesis project, or a bootstrapped SaaS, the automated onboarding system simply shuts the door on you.
+
+Technically possible in theory does not automatically mean accessible in practice.
+
+This friction forced me to pivot the entire financial architecture of Voca toward Xendit.
+
+The contrast between the two platforms from a developer-experience (DX) standpoint was night and day. Where Midtrans guarded its disbursement gateway behind compliance gatekeeping, Xendit embraced an open, developer-first sandbox model. Within minutes of switching, I was able to generate development API keys with full Read and Write permissions for both Money In (Invoices) and Money Out (Disbursements).
+
+The technical implementation in Next.js instantly became significantly cleaner:
+
+```typescript
+const xenditRes = await fetch('https://api.xendit.co/v2/payouts', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${basicAuth}`,
+        'idempotency-key': externalId
+    },
+    body: JSON.stringify({
+        reference_id: externalId,
+        channel_code,
+        channel_properties: {
+            account_number,
+            account_holder_name: account_holder_name || undefined
+        },
+        amount,
+        currency: 'IDR',
+        description: `Penarikan Saldo Voca - ${externalId}`
+    })
+})
+
+```
+
+Instead of bloating the codebase with heavy third-party SDK dependencies, Xendit’s straightforward REST API allowed me to implement raw HTTP requests using native fetch. This approach kept the Next.js serverless architecture lightweight, gave me full control over the headers such as enforcing the idempotency-key for safe retries and explicitly shaped the transactional payload.
+
+Bypassing an opaque library layer made testing the exact lifecycle of a respondent's withdrawal incredibly transparent: from handling basic authentication tokens, triggering the request, checking the immediate API responses, to simulating a completed payout directly via Xendit's dashboard.
+
+Looking back, this architectural pivot taught me a valuable lesson about infrastructure selection.
+
+When choosing third-party APIs for a startup or an indie project, technical capability is only half the equation. The other half is compliance elasticity. A platform can have the most beautiful documentation in the world, but if its onboarding friction prevents you from testing your core workflows end-to-end, it becomes a liability to your development velocity.
+
+Moving to Xendit allowed Voca to maintain its architectural integrity. Our PostgreSQL RPC functions can now talk seamlessly with a live sandbox environment, simulating real-world financial circulation without needing a corporate deed of establishment just to write code.
+
+In the end, good software engineering is not just about writing elegant logic. It’s about choosing the path that minimizes friction, allowing you to validate your product ideas in the real world as efficiently as possible.
